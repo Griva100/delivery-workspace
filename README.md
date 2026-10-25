@@ -58,6 +58,12 @@ The tests require the isolated local PostgreSQL and Redis services. They create 
 
 The GitHub Actions workflow includes PostgreSQL and Redis services and runs migrations, tests and the build. The initial GitHub Actions run passed migrations, tests and the production build on Node.js 24.
 
+## Automatic production deployments
+
+The repository is connected to its Vercel project. Every push to `main` triggers a production build. Vercel runs `npm run vercel-build` to apply the idempotent schema migration, check TypeScript and build the frontend, then updates the live application after a successful build.
+
+GitHub Actions also runs the 11 automated tests and the build on pushes and pull requests. The production `DATABASE_URL` stays in Vercel's sensitive environment variables. Database-backed deployments from other branches need an isolated `DATABASE_URL` in Vercel's Preview environment.
+
 ## Vercel deployment
 
 The live frontend and Express API run on Vercel with persistent Prisma PostgreSQL storage. Public access and authenticated workflows were verified on 26 October 2026. The hosted deployment uses inline CSV exports; Redis caching and the BullMQ worker are included and tested through Docker and GitHub Actions.
