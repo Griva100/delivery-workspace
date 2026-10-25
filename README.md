@@ -2,8 +2,9 @@
 
 [![Application checks](https://github.com/Griva100/delivery-workspace/actions/workflows/checks.yml/badge.svg)](https://github.com/Griva100/delivery-workspace/actions/workflows/checks.yml)
 A working full stack project and task management application built with React, TypeScript, Node.js, Express, PostgreSQL, Redis and BullMQ. It includes account creation, secure session cookies, task editing, priorities, due dates, report exports, automated integration tests, Docker support and Vercel configuration.
+**Live application:** [https://griva-delivery-workspace.vercel.app](https://griva-delivery-workspace.vercel.app)
 
-This project was developed with AI assistance for Griva Shah. It is separate project work, not a claim of client adoption, measured production scale or additional years of employment. Review the implementation and verification record before presenting it in an interview.
+Developed for Griva Shah with AI assistance.
 
 ## Features
 
@@ -36,7 +37,7 @@ In a second terminal:
 npm run worker
 ```
 
-Open `http://127.0.0.1:4188`. Create your own account or browse the read-only sample. The database and Redis use project-specific Docker volumes. The sample credentials in Compose are for loopback development.
+Open `http://127.0.0.1:4188`. Create your own account or choose **Explore a sample workspace** to browse without signing in. The database and Redis use project-specific Docker volumes. The sample credentials in Compose are for loopback development.
 
 To run everything in Docker instead:
 
@@ -59,13 +60,13 @@ The GitHub Actions workflow includes PostgreSQL and Redis services and runs migr
 
 ## Vercel deployment
 
-The frontend and Express API are configured for Vercel. Deployment needs an authenticated Vercel account and a reachable, persistent PostgreSQL database; local Docker storage is not a hosted database. No Vercel deployment URL is claimed until deployment has succeeded.
+The live frontend and Express API run on Vercel with persistent Prisma PostgreSQL storage. Public access and authenticated workflows were verified on 26 October 2026. The hosted deployment uses inline CSV exports; Redis caching and the BullMQ worker are included and tested through Docker and GitHub Actions.
 
 1. Connect the project source to Vercel, or run the Vercel CLI from this folder after signing in.
 2. Configure `DATABASE_URL` with a hosted, pooled PostgreSQL connection string. Keep credentials in Vercel environment variables.
 3. Set `REPORT_MODE=inline` for the simplest complete deployment. This generates small CSV reports in the request; it does not pretend a BullMQ worker is running.
 4. If using Redis caching, configure `REDIS_URL` for a reachable Redis service. It is optional in inline mode.
-5. Apply the schema to the intended database once using `npm run db:migrate` with that environment. Do not point the integration tests at a production database.
+5. The Vercel build applies the idempotent schema migration before compilation. Local migrations are available through `npm run db:migrate`. Use an isolated local database for integration tests.
 6. Deploy using the included `vercel.json`, then set `APP_URL` to the verified production HTTPS URL and redeploy if needed.
 7. Verify sign-up, task changes, sign-out and report downloads at the resulting URL.
 
