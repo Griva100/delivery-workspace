@@ -1,5 +1,6 @@
 # Delivery Workspace
 
+[![Application checks](https://github.com/Griva100/delivery-workspace/actions/workflows/checks.yml/badge.svg)](https://github.com/Griva100/delivery-workspace/actions/workflows/checks.yml)
 A working full stack project and task management application built with React, TypeScript, Node.js, Express, PostgreSQL, Redis and BullMQ. It includes account creation, secure session cookies, task editing, priorities, due dates, report exports, automated integration tests, Docker support and Vercel configuration.
 
 This project was developed with AI assistance for Griva Shah. It is separate project work, not a claim of client adoption, measured production scale or additional years of employment. Review the implementation and verification record before presenting it in an interview.
@@ -54,7 +55,7 @@ npm run build
 
 The tests require the isolated local PostgreSQL and Redis services. They create disposable users and clean up their own database rows. They cover authentication, authorization, cache invalidation, stale edits, concurrency, invalid batches, dates, queue processing, CSV safety, sign-out, persistence across API instances and inline exports.
 
-The GitHub Actions workflow includes PostgreSQL and Redis services and runs migrations, tests and the build. Remote CI execution is not claimed until it actually runs in a repository.
+The GitHub Actions workflow includes PostgreSQL and Redis services and runs migrations, tests and the build. The initial GitHub Actions run passed migrations, tests and the production build on Node.js 24.
 
 ## Vercel deployment
 
