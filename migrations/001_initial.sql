@@ -1,0 +1,12 @@
+BEGIN;
+CREATE TABLE IF NOT EXISTS users(id uuid PRIMARY KEY,email text NOT NULL UNIQUE,name text NOT NULL,password_hash text NOT NULL,created_at timestamptz NOT NULL DEFAULT now());
+CREATE TABLE IF NOT EXISTS sessions(token_hash text PRIMARY KEY,user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,expires_at timestamptz NOT NULL);
+CREATE TABLE IF NOT EXISTS projects(id uuid PRIMARY KEY,owner_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,name text NOT NULL,description text NOT NULL DEFAULT '',created_at timestamptz NOT NULL DEFAULT now());
+CREATE TABLE IF NOT EXISTS tasks(id uuid PRIMARY KEY,project_id uuid NOT NULL REFERENCES projects(id) ON DELETE CASCADE,title text NOT NULL,description text NOT NULL DEFAULT '',status text NOT NULL DEFAULT 'todo' CHECK(status IN('todo','in_progress','done')),priority text NOT NULL DEFAULT 'medium' CHECK(priority IN('low','medium','high')),due_date date,version integer NOT NULL DEFAULT 1,created_at timestamptz NOT NULL DEFAULT now(),updated_at timestamptz NOT NULL DEFAULT now());
+CREATE TABLE IF NOT EXISTS activity(id bigserial PRIMARY KEY,user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,message text NOT NULL,created_at timestamptz NOT NULL DEFAULT now());
+CREATE TABLE IF NOT EXISTS reports(id uuid PRIMARY KEY,user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,project_id uuid NOT NULL REFERENCES projects(id) ON DELETE CASCADE,state text NOT NULL DEFAULT 'pending' CHECK(state IN('pending','processing','completed','failed')),content text,error text,created_at timestamptz NOT NULL DEFAULT now(),updated_at timestamptz NOT NULL DEFAULT now());
+CREATE TABLE IF NOT EXISTS auth_attempts(key text PRIMARY KEY,count integer NOT NULL,expires_at timestamptz NOT NULL);
+CREATE INDEX IF NOT EXISTS projects_owner_idx ON projects(owner_id);
+CREATE INDEX IF NOT EXISTS tasks_project_idx ON tasks(project_id,created_at);
+CREATE INDEX IF NOT EXISTS sessions_expiry_idx ON sessions(expires_at);
+COMMIT;

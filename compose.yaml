@@ -1,0 +1,57 @@
+name: griva-delivery-workspace
+services:
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: delivery
+      POSTGRES_PASSWORD: delivery_dev_only
+      POSTGRES_DB: delivery
+    ports: ["127.0.0.1:5437:5432"]
+    volumes: ["delivery_pg:/var/lib/postgresql"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U delivery -d delivery"]
+      interval: 2s
+      timeout: 2s
+      retries: 20
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
+    ports: ["127.0.0.1:6387:6379"]
+    volumes: ["delivery_redis:/data"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 2s
+      retries: 20
+  app:
+    build: .
+    profiles: ["full"]
+    command: ["sh", "-c", "npm run db:migrate && npm start"]
+    environment:
+      DATABASE_URL: postgres://delivery:delivery_dev_only@postgres:5432/delivery
+      REDIS_URL: redis://redis:6379
+      REPORT_MODE: queue
+      PORT: 4188
+      HOST: 0.0.0.0
+    ports: ["127.0.0.1:4188:4188"]
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:4188/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+    depends_on:
+      postgres: {condition: service_healthy}
+      redis: {condition: service_healthy}
+  worker:
+    build: .
+    profiles: ["full"]
+    command: ["npm", "run", "worker"]
+    environment:
+      DATABASE_URL: postgres://delivery:delivery_dev_only@postgres:5432/delivery
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      app: {condition: service_healthy}
+volumes:
+  delivery_pg:
+  delivery_redis:

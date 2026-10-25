@@ -1,0 +1,11 @@
+.env
+.env.*
+.vercel
+node_modules
+test-results
+coverage
+*.log
+Dockerfile
+compose.yaml
+
+.git

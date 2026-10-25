@@ -1,0 +1,36 @@
+name: Application checks
+on: [push, pull_request]
+jobs:
+  application:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: delivery
+          POSTGRES_PASSWORD: delivery_dev_only
+          POSTGRES_DB: delivery
+        ports: ['5437:5432']
+        options: >-
+          --health-cmd "pg_isready -U delivery -d delivery"
+          --health-interval 2s --health-timeout 2s --health-retries 20
+      redis:
+        image: redis:7-alpine
+        ports: ['6387:6379']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 2s --health-timeout 2s --health-retries 20
+    env:
+      DATABASE_URL: postgres://delivery:delivery_dev_only@127.0.0.1:5437/delivery
+      REDIS_URL: redis://127.0.0.1:6387
+      REPORT_MODE: queue
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run db:migrate
+      - run: npm test
+      - run: npm run build
