@@ -4,8 +4,6 @@
 A working full stack project and task management application built with React, TypeScript, Node.js, Express, PostgreSQL, Redis and BullMQ. It includes account creation, secure session cookies, task editing, priorities, due dates, report exports, automated integration tests, Docker support and Vercel configuration.
 **Live application:** [https://griva-delivery-workspace.vercel.app](https://griva-delivery-workspace.vercel.app)
 
-Developed for Griva Shah with AI assistance.
-
 ## Features
 
 - Account registration, sign-in and sign-out with scrypt password hashes and hashed server-side sessions.
